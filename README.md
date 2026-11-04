@@ -7,6 +7,8 @@
 
 I am an Assistant Professor at the Graduate School of Information Sciences, Tohoku University. My research spans four connected directions, **AI4Cog** (AI for cognitive science), **Cog4AI** (cognitive science for AI), **AI4Brain** (AI for neuroscience) and **Brain4AI** (neuroscience for AI).
 
+**I am actively looking for collaborators**, especially labs with behavioral, EEG, eye-tracking or fMRI data, and AI groups who want to test language models, agents or decision models with methods from cognitive science. [Email me](mailto:hou.dengzhe.t8@dc.tohoku.ac.jp?subject=Collaboration) or see [how we could work together](https://dengzhe-hou.github.io/#collaboration).
+
 ### Selected research
 
 - **[S1CogBench](https://github.com/dengzhe-hou/S1CogBench)**, what System One decision models can and cannot do on cognitive experiments ([arXiv](https://arxiv.org/abs/2611.00911))
