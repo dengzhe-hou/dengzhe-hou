@@ -4,6 +4,9 @@ pattern ripple) and a light sweep over the name (after its wordmark shimmer).
 Text is converted to outlines so the SVG renders the same everywhere; GitHub serves README images
 without web fonts or scripts, so all motion is SMIL inside the SVG.
 
+Browsers repaint the whole image on every animation frame, so the motion avoids masks: each ripple is
+a few pattern-stroked rings, the left fade is a gradient overlay, and the shimmer is a gradient fill.
+
 Fonts: tools/fonts/SourceSans3.ttf (Google Fonts, variable) and Noto Sans JP (Windows: C:/Windows/Fonts/NotoSansJP-VF.ttf).
 Usage: python -I -B tools/build_banner.py .
 """
@@ -18,6 +21,8 @@ from fontTools.varLib.instancer import instantiateVariableFont
 HERE = Path(__file__).parent
 OUT = Path(sys.argv[1])
 W, H = 1280, 300
+# the dot field fades in between these x positions; nothing is drawn to the left of the first
+FADE = (384, 794)
 
 THEMES = {
     "light": dict(bg="#ffffff", ink="#000000", sub="#555555", accent="#0076df", dot="#000000", dot_op=0.10, glow="#0076df", shimmer=0.55),
@@ -40,7 +45,7 @@ def text_path(f, text, x, y, size, tracking=0.0):
     """Outline of `text` with its baseline at (x, y); returns (path d, advance width)."""
     gs, cmap, hmtx = f.getGlyphSet(), f.getBestCmap(), f["hmtx"]
     scale = size / f["head"].unitsPerEm
-    pen = SVGPathPen(gs)
+    pen = SVGPathPen(gs, ntos=lambda v: f"{v:.1f}".rstrip("0").rstrip("."))
     cx = x
     for ch in text:
         g = cmap[ord(ch)]
@@ -69,53 +74,51 @@ def banner(t):
     # ripples: origin, start (s) within a 12 s loop, reach (px)
     ripples = [(1090, 140, 0.0, 560), (940, 240, 4.0, 520), (1200, 50, 8.0, 540)]
     loop = 12.0
-    grads, masks, layers = [], [], []
-    for i, (cx, cy, start, reach) in enumerate(ripples):
+    # soft wavefront as nested rings (inner and outer edge as fractions of reach, opacity), bright at 0.86-0.93
+    bands = [(0.62, 1.0, 0.3), (0.74, 0.97, 0.4), (0.86, 0.93, 1.0)]
+    layers = []
+    for cx, cy, start, reach in ripples:
         a, b = start / loop, (start + 4.4) / loop
-        kt = f"0;{a:.4f};{b:.4f};1"
-        grads.append(
-            f'<radialGradient id="rg{i}" gradientUnits="userSpaceOnUse" cx="{cx}" cy="{cy}" r="1">'
-            '<stop offset="0" stop-color="#000"/><stop offset="0.62" stop-color="#000"/>'
-            '<stop offset="0.86" stop-color="#fff"/><stop offset="0.93" stop-color="#fff"/>'
-            '<stop offset="1" stop-color="#000"/>'
-            f'<animate attributeName="r" dur="{loop}s" repeatCount="indefinite" calcMode="spline" '
-            f'keyTimes="{kt}" values="1;1;{reach};{reach}" keySplines="0 0 1 1;0.25 0.45 0.45 1;0 0 1 1"/>'
-            "</radialGradient>"
+        timing = f'dur="{loop}s" repeatCount="indefinite" calcMode="spline"'
+        grow = f'keyTimes="0;{a:.4f};{b:.4f};1" keySplines="0 0 1 1;0.25 0.45 0.45 1;0 0 1 1"'
+        rings = "".join(
+            f'<circle cx="{cx}" cy="{cy}" r="1" fill="none" stroke="url(#glowdots)" stroke-opacity="{op}">'
+            f'<animate attributeName="r" {timing} {grow} values="1;1;{reach * (lo + hi) / 2:.0f};{reach * (lo + hi) / 2:.0f}"/>'
+            f'<animate attributeName="stroke-width" {timing} {grow} values="0;0;{reach * (hi - lo):.0f};{reach * (hi - lo):.0f}"/></circle>'
+            for lo, hi, op in bands
         )
-        masks.append(f'<mask id="m{i}"><rect width="{W}" height="{H}" fill="url(#rg{i})"/></mask>')
         layers.append(
-            f'<g mask="url(#m{i})" opacity="0"><rect width="{W}" height="{H}" fill="url(#glowdots)"/>'
-            f'<animate attributeName="opacity" dur="{loop}s" repeatCount="indefinite" calcMode="spline" '
+            f'<g opacity="0">{rings}<animate attributeName="opacity" {timing} '
             f'keyTimes="0;{a:.4f};{a + 0.01:.4f};{b:.4f};1" values="0;0;1;0;0" '
             'keySplines="0 0 1 1;0 0 1 1;0.4 0 0.8 1;0 0 1 1"/></g>'
         )
 
-    shimmer_mask = (
+    shimmer = (
         '<linearGradient id="sweep" gradientUnits="userSpaceOnUse" x1="-400" y1="0" x2="-100" y2="0">'
-        '<stop offset="0" stop-color="#000"/><stop offset="0.5" stop-color="#fff"/><stop offset="1" stop-color="#000"/>'
+        f'<stop offset="0" stop-color="{t['accent']}" stop-opacity="0"/>'
+        f'<stop offset="0.5" stop-color="{t['accent']}" stop-opacity="{t['shimmer']}"/>'
+        f'<stop offset="1" stop-color="{t['accent']}" stop-opacity="0"/>'
         f'<animateTransform attributeName="gradientTransform" type="translate" dur="{loop}s" repeatCount="indefinite" '
         'keyTimes="0;0.02;0.14;1" values="0 0;0 0;1250 0;1250 0"/></linearGradient>'
-        f'<mask id="ms"><rect width="{W}" height="{H}" fill="url(#sweep)"/></mask>'
     )
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="Dengzhe Hou 侯登哲. Assistant Professor, Graduate School of Information Sciences, Tohoku University. AI4Cog, Cog4AI, AI4Brain, Brain4AI.">
 <defs>
 <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.5" fill="{t['dot']}"/></pattern>
 <pattern id="glowdots" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.9" fill="{t['glow']}"/></pattern>
-<linearGradient id="fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000"/><stop offset="0.3" stop-color="#000"/><stop offset="0.62" stop-color="#fff"/></linearGradient>
-<mask id="field"><rect width="{W}" height="{H}" fill="url(#fade)"/></mask>
-{"".join(grads)}
-{"".join(masks)}
-{shimmer_mask}
+<linearGradient id="fade" gradientUnits="userSpaceOnUse" x1="{FADE[0]}" y1="0" x2="{FADE[1]}" y2="0"><stop offset="0" stop-color="{t['bg']}"/><stop offset="1" stop-color="{t['bg']}" stop-opacity="0"/></linearGradient>
+{shimmer}
+<clipPath id="card"><rect width="{W}" height="{H}" rx="12"/></clipPath>
 </defs>
-<rect width="{W}" height="{H}" rx="12" fill="{t['bg']}"/>
-<g mask="url(#field)">
-<rect width="{W}" height="{H}" fill="url(#dots)" opacity="{t['dot_op']}"/>
+<g clip-path="url(#card)">
+<rect width="{W}" height="{H}" fill="{t['bg']}"/>
+<rect x="{FADE[0]}" width="{W - FADE[0]}" height="{H}" fill="url(#dots)" opacity="{t['dot_op']}"/>
 {"".join(layers)}
+<rect x="{FADE[0] - 1}" width="{FADE[1] - FADE[0] + 1}" height="{H}" fill="url(#fade)"/>
 </g>
 <path d="{name_d}" fill="{t['ink']}"/>
 <path d="{cjk_d}" fill="{t['ink']}"/>
-<g mask="url(#ms)" opacity="{t['shimmer']}"><path d="{name_d}" fill="{t['accent']}"/><path d="{cjk_d}" fill="{t['accent']}"/></g>
+<path d="{name_d}{cjk_d}" fill="url(#sweep)"/>
 <path d="{role_d}" fill="{t['sub']}"/>
 <path d="{dirs_d}" fill="{t['accent']}"/>
 <path d="{seps_d}" fill="{t['sub']}"/>
