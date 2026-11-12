@@ -20,6 +20,6 @@ I am an Assistant Professor at the Graduate School of Information Sciences, Toho
 - **[Auto-EEG-Analysis](https://github.com/dengzhe-hou/Auto-EEG-Analysis)**, EEG analysis skills for MNE-Python, with executable specifications
 - **[CogEEGAgent](https://github.com/dengzhe-hou/CogEEGAgent)**, bounded cognitive EEG analysis with language models and deterministic scientific controls
 - **[Look et al.](https://looketal.com/)**, a design library of academic web pages, each with an AI-readable DESIGN.md
-- **[research-writing-prompts](https://github.com/dengzhe-hou/research-writing-prompts)**, 科研写作 prompt 合集，25 个场景，逐条标明来源
+- **[Research-Writing-Prompts](https://github.com/dengzhe-hou/Research-Writing-Prompts)**, 科研写作 prompt 合集，25 个场景，逐条标明来源
 
 [Website](https://dengzhe-hou.github.io/) · [Google Scholar](https://scholar.google.com/citations?user=3BV4d9kAAAAJ) · [ORCID](https://orcid.org/0000-0002-1036-7979) · [X](https://x.com/dengzhehou) · [LinkedIn](https://www.linkedin.com/in/dengzhe-hou-a47135293)
