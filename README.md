@@ -17,7 +17,7 @@ I am an Assistant Professor at the Graduate School of Information Sciences, Toho
 
 ### Tools and resources
 
-- **[auto-eeg-analysis](https://github.com/dengzhe-hou/auto-eeg-analysis)**, EEG analysis skills for MNE-Python, with executable specifications
+- **[Auto-EEG-Analysis](https://github.com/dengzhe-hou/Auto-EEG-Analysis)**, EEG analysis skills for MNE-Python, with executable specifications
 - **[CogEEGAgent](https://github.com/dengzhe-hou/CogEEGAgent)**, bounded cognitive EEG analysis with language models and deterministic scientific controls
 - **[Look et al.](https://looketal.com/)**, a design library of academic web pages, each with an AI-readable DESIGN.md
 - **[research-writing-prompts](https://github.com/dengzhe-hou/research-writing-prompts)**, 科研写作 prompt 合集，25 个场景，逐条标明来源
