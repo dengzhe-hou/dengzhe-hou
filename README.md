@@ -11,6 +11,7 @@ I am an Assistant Professor at the Graduate School of Information Sciences, Toho
 
 ### Selected research
 
+- **[EEGJev](https://github.com/dengzhe-hou/EEGJev)**, a System One EEG decision model and benchmark with six question types across 19 public EEG sources ([arXiv](https://arxiv.org/abs/2611.32100) · [project site](https://dengzhe-hou.github.io/EEGJev/))
 - **[RSI-Healthcare-Agents](https://github.com/dengzhe-hou/RSI-Healthcare-Agents)**, a survey of recursive self-improvement in healthcare AI agents, with an evidence map of 85 studies ([alphaXiv](https://www.alphaxiv.org/abs/2611.recursive-self-improvement-healthcare-agents) · [project site](https://dengzhe-hou.github.io/RSI-Healthcare-Agents/))
 - **[S1CogBench](https://github.com/dengzhe-hou/S1CogBench)**, what System One decision models can and cannot do on cognitive experiments ([arXiv](https://arxiv.org/abs/2611.00911))
 - **[CogBattery](https://github.com/dengzhe-hou/CogBattery)**, human-referenced evaluation of cognitive task behavior and structure in language models ([arXiv](https://arxiv.org/abs/2607.24999))
